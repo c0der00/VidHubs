@@ -181,7 +181,6 @@ const getVideoById = asyncHandler(async (req, res) => {
   }
 
   try {
-    await Video.findByIdAndUpdate(videoId, { $inc: { viwes: 1/2 } });
     const video = await Video.aggregate([
       {
         $match: {
@@ -250,13 +249,27 @@ const getVideoById = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Video not found");
     }
 
+    const currentVideo = video[0];
+
+    if (currentVideo.duration > 0) {
+      // Increment view count
+    await Video.findByIdAndUpdate(videoId, { $inc: { viwes: 1 } });
+
+      if (req.user?._id) {
+        await User.findByIdAndUpdate(req.user._id, {
+          $addToSet: { watchHistory: videoId } // prevents duplicates
+        });
+      }
+    }
+
     return res
       .status(200)
-      .json(new ApiResponse(200, video[0], "Video retrieved successfully"));
+      .json(new ApiResponse(200, currentVideo, "Video retrieved successfully"));
   } catch (error) {
     throw new ApiError(500, error.message);
   }
 });
+
 
 
 const updateVideo = asyncHandler(async (req, res) => {

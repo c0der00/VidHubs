@@ -342,45 +342,51 @@ const getUserChannelProfile = asyncHandler(async(req,res) => {
 const getWatchHistory = asyncHandler(async(req,res)=> {
     const user = await User.aggregate([
         {
-            $match:{
+            $match: {
                 _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
-            $lookup:{
-                form:"videos",
-                localField:"WatchHistory",
-                foreignField:"_id",
-                as:"watchHistory",
-                pipeline:[
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
                     {
-                        $lookup : {
-                            from : "users",
+                        $lookup: {
+                            from: "users",
                             localField: "owner",
-                            foreignField:"_id",
-                            as : "owner",
-                            pipeline : [
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
                                 {
-                                    $project:{
-                                        fullName : 1,
-                                        username : 1,
-                                        avatar : 1
-                                    }
-                                },
-                                {
-                                    $addFields : {
-                                        owner : {
-                                            $first:"$videos"
-                                        }
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
                                     }
                                 }
                             ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: { $arrayElemAt: ["$owner", 0] }
                         }
                     }
                 ]
             }
         }
-    ])
+    ]);
+
+    return res.json(
+        new ApiResponse(
+            200,
+            user,
+            "watch history"
+        )
+    )
 })
 
 export {

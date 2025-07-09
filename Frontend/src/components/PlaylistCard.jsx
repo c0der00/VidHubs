@@ -8,7 +8,8 @@ export function PlaylistCard({ video }) {
       className="flex flex-col sm:flex-row gap-4 hover:bg-muted/30 p-2 rounded-lg transition group"
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video sm:w-48 w-full rounded-md overflow-hidden bg-muted shrink-0">
+      <div className="relative aspect-video sm:w-48 w-full rounded-md overflow-hidden bg-muted shrink-0">{console.log(video)
+      }
         {video.thumbnail ? (
           <img
             src={video.thumbnail}
@@ -17,7 +18,7 @@ export function PlaylistCard({ video }) {
           />
         ) : (
           <img
-            src="/placeholder.svg"
+            src={"/placeholder.svg"}
             alt="Video thumbnail"
             className="object-cover w-full h-full"
           />

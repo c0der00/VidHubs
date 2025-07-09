@@ -12,7 +12,7 @@ const mainNavItems = [
   { icon: PlaySquare, label: "Subscriptions", to: "/subscriptions" },
 ]
 const libraryItems = [
-  { icon: Clock, label: "History", to: "/history" },
+  { icon: Clock, label: "History", to: "/watch-hisroty" },
   { icon: PlaySquare, label: "Your Videos", to: "/your-videos" },
   { icon: ThumbsUp, label: "Liked Videos", to: "/liked-videos" },
 ]

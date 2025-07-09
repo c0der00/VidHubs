@@ -99,7 +99,7 @@ export function YoutubeHeader() {
               type="search"
               placeholder="Search"
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full text-black-600 rounded-full border bg-muted/50 focus:ring focus:ring-ring"
+              className="w-full  rounded-full border bg-muted/50 focus:ring focus:ring-ring"
             />
             <Button
               type="submit"
