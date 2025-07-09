@@ -32,11 +32,11 @@ export function ChannelInfo({username}) {
   const handleSubscribe = async () => {
     try {
       setIsSubscribing(true)
-      await axios.post(`/api/v1/subscriptions/c/${channelData._id}`)
+      await axios.post(`/api/v1/sub/togglesubscription/${channelData._id}`)
       setIsSubscribed(!isSubscribed)
       setChannelData(prev => ({
         ...prev,
-        subscribersCount: isSubscribed ? prev.subscribersCount - 1 : prev.subscribersCount + 1,
+        subscriberCount: isSubscribed ? prev.subscriberCount - 1 : prev.subscriberCount + 1,
         isSubscribed: !isSubscribed
       }))
       setIsSubscribing(false)
@@ -57,9 +57,9 @@ export function ChannelInfo({username}) {
           <AvatarImage src={channelData.avatar} alt={channelData.fullName} />
           <AvatarFallback>{channelData.fullName[0]}</AvatarFallback>
         </Avatar>
-        <div>
+        <div>{console.log(channelData)}
           <h1 className="text-2xl font-bold">{channelData.fullName}</h1>
-          <p className="text-muted-foreground">{channelData.subscribersCount} subscribers</p>
+          <p className="text-muted-foreground">{channelData.subscriberCount} subscribers</p>
           <p className="mt-4 text-sm w-full lg:w-1/2">@{channelData.username}</p>
         </div>
       </div>

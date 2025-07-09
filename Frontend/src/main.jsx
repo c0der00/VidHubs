@@ -22,6 +22,7 @@ import { YoutubeHeader } from "./components/youtube-header"
 import { SidebarProvider } from "./components/ui/sidebar"
 import VideoDetail from "./pages/VideoDetail.jsx";
 import ChannelPage from "./pages/ChannelPage.jsx";
+import PlaylistDetailPage from "./components/PlaylistDetail.jsx";
 
 
 const AppLayout = () => (
@@ -47,6 +48,7 @@ createRoutesFromElements(
     <Route path="/video/:videoId" element={<VideoDetail />} />
     <Route path="/c/:username" element={<ChannelPage />} />
     <Route path="/publish-video" element={<PublishPage />} />
+    <Route path="//playlist/:playlistId" element={<PlaylistDetailPage/>}/>
     </Route>
 )
 );

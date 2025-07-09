@@ -5,6 +5,7 @@ import formatTime from "../utils/formatTime"
 
 export function VideoCard({ video }) {
   const [videoData, setVideoData] = useState(video)
+console.log(video);
 
   useEffect(() => {
     // Update videoData when video prop changes
@@ -29,20 +30,21 @@ export function VideoCard({ video }) {
       </Link>
       <div className="flex space-x-3">
         <Link to={`/c/${videoData.owner?.username}`}>
-          <Avatar className="h-9 w-9">
+          <Avatar className="h-9 w-9">{console.log('reco',videoData)}
+          
             <AvatarImage src={videoData.owner?.avatar} alt={videoData.owner?.fullName} />
             <AvatarFallback>{videoData.owner?.fullName?.[0]}</AvatarFallback>
           </Avatar>
         </Link>
         <div className="flex flex-col">
-          <Link to={`/videos/${videoData._id}`}>
+          <Link to={`/video/${videoData._id}`}>
             <h3 className="line-clamp-2 text-sm font-medium">{videoData.title}</h3>
           </Link>
           <Link to={`/c/${videoData.owner?.username}`}>
             <p className="text-xs text-muted-foreground">{videoData.owner?.fullName}</p>
           </Link>
           <p className="text-xs text-muted-foreground">
-            {videoData.views} views • {videoData.createdAt}
+            {videoData.viwes} views • {new Date(videoData.createdAt).toLocaleDateString()}
           </p>
         </div>
       </div>

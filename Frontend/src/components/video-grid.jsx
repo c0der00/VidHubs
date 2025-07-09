@@ -28,20 +28,22 @@ export function VideoGrid({channelId}) {
     const fetchVideos = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`/api/v1/videos?page=${page}&limit=10&sortBy=createdAt&sortType=desc&userId=${channelId}`)
-        
+        const response = await axios.get(`/api/v1/videos/getChannelVideosByChannelId?page=${page}&limit=10&sortBy=createdAt&sortType=desc&userId=${channelId}`)
+       
         // Filter out any duplicate videos based on _id
-        const newVideos = response.data.data.videos
+        const newVideos = response.data?.data
+        console.log(response.data);
+        
         setVideos(prev => {
           const uniqueVideos = [...prev]
-          newVideos.forEach(video => {
+          newVideos?.forEach(video => {
             if (!uniqueVideos.find(v => v._id === video._id)) {
               uniqueVideos.push(video)
             }
           })
           return uniqueVideos
         })
-        setHasMore(response.data.data.pagination.hasNextPage)
+        setHasMore(response.data?.data?.massage?.pagination.hasNextPage)
         setLoading(false)
       } catch (err) {
         setError(err.message)
@@ -56,6 +58,7 @@ export function VideoGrid({channelId}) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      { console.log(videos,"DDDDDDDDDDDDDDDDDDDD")}
       {videos.map((video, index) => {
         if (videos.length === index + 1) {
           return (

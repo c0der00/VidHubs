@@ -17,6 +17,8 @@ export function VideoInfo({ video}) {
     const fetchChannelData = async () => {
       try {
         const response = await axios.get(`/api/v1/users/c/${video.owner.username}`)
+        console.log('data',response);
+        
         setChannelData(response.data.data)
         console.log(response.data.data)
         setIsSubscribed(response.data.data.isSubscribed)
@@ -26,18 +28,17 @@ export function VideoInfo({ video}) {
         setLoading(false)
       }
     }
-
     fetchChannelData()
   }, [video])
 
   const handleSubscribe = async () => {
     try {
-      const data = await axios.post(`/api/v1/subscriptions/c/${video.owner._id}`)
+      const data = await axios.post(`/api/v1/sub/togglesubscription/${video.owner._id}`)
       console.log("subscribe", data)
       setIsSubscribed(!isSubscribed)
       setChannelData(prev => ({
         ...prev,
-        subscribersCount: isSubscribed ? prev.subscribersCount - 1 : prev.subscribersCount + 1,
+        subscriberCount: isSubscribed ? prev.subscriberCount - 1 : prev.subscriberCount + 1,
         isSubscribed: !isSubscribed
       }))
     } catch (err) {
@@ -47,7 +48,7 @@ export function VideoInfo({ video}) {
 
   const handleLike = async () => {
     try {
-      await axios.post(`/api/v1/likes/toggle/v/${video._id}`)
+      await axios.post(`/api/v1/like/togglevideolike/${video._id}`)
       setIsLiked(!isLiked)
       setLikesCount(prev => isLiked ? prev - 1 : prev + 1)
     } catch (err) {
@@ -69,7 +70,8 @@ export function VideoInfo({ video}) {
           </Avatar>
           <div>
             <p className="font-semibold">{channelData.fullName}</p>
-            <p className="text-sm text-muted-foreground">{channelData.subscribersCount} subscribers</p>
+            {console.log(channelData,"dlfndddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")}
+            <p className="text-sm text-muted-foreground">{channelData.subscriberCount} subscribers</p>
           </div>
         </div>
         <div className="flex space-x-2">

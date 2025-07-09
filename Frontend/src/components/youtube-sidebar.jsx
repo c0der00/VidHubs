@@ -1,39 +1,30 @@
-"use client"
+import React, { useState, useEffect } from "react"
 import {
-  Home,
-  Compass,
-  PlaySquare,
-  Clock,
-  ThumbsUp,
-  Flame,
-  Music2,
-  Gamepad2,
-  Trophy,
-  Film,
-  Newspaper,
-  Radio,
-  Plus,
-  Menu,
-  Youtube,
+  Home, Compass, PlaySquare, Clock, ThumbsUp, Flame, Music2,
+  Gamepad2, Trophy, Film, Newspaper, Radio, Plus, Menu,
 } from "lucide-react"
+import { Link } from "react-router-dom"
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-} from "./ui/sidebar"
-import { ScrollArea } from "./ui/scroll-area"
-import { Separator } from "./ui/separator"
-import { Button } from "./ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet"
-
-// Sample subscription data
+// Sample nav data
+const mainNavItems = [
+  { icon: Home, label: "Home", to: "/" },
+  { icon: Compass, label: "Explore", to: "/explore" },
+  { icon: PlaySquare, label: "Subscriptions", to: "/subscriptions" },
+]
+const libraryItems = [
+  { icon: Clock, label: "History", to: "/history" },
+  { icon: PlaySquare, label: "Your Videos", to: "/your-videos" },
+  { icon: ThumbsUp, label: "Liked Videos", to: "/liked-videos" },
+]
+const exploreItems = [
+  { icon: Flame, label: "Trending", to: "/trending" },
+  { icon: Music2, label: "Music", to: "/music" },
+  { icon: Gamepad2, label: "Gaming", to: "/gaming" },
+  { icon: Trophy, label: "Sports", to: "/sports" },
+  { icon: Film, label: "Movies", to: "/movies" },
+  { icon: Newspaper, label: "News", to: "/news" },
+  { icon: Radio, label: "Live", to: "/live" },
+]
 const subscriptions = [
   { id: 1, name: "Vercel", avatar: "/placeholder.svg?height=32&width=32" },
   { id: 2, name: "Next.js", avatar: "/placeholder.svg?height=32&width=32" },
@@ -42,143 +33,119 @@ const subscriptions = [
   { id: 5, name: "ShadcnUI", avatar: "/placeholder.svg?height=32&width=32" },
 ]
 
-const mainNavItems = [
-  { icon: Home, label: "Home" },
-  { icon: Compass, label: "Explore" },
-  { icon: PlaySquare, label: "Subscriptions" },
-]
+function SidebarContent({ collapsed }) {
+  const baseItem = `
+    flex items-center gap-3 p-2 rounded
+    hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]
+    transition text-[var(--sidebar-foreground)]
+  `
+  const label = "text-sm"
 
-const libraryItems = [
-  { icon: Clock, label: "History" },
-  { icon: PlaySquare, label: "Your Videos" },
-  { icon: ThumbsUp, label: "Liked Videos" },
-]
-
-const exploreItems = [
-  { icon: Flame, label: "Trending" },
-  { icon: Music2, label: "Music" },
-  { icon: Gamepad2, label: "Gaming" },
-  { icon: Trophy, label: "Sports" },
-  { icon: Film, label: "Movies" },
-  { icon: Newspaper, label: "News" },
-  { icon: Radio, label: "Live" },
-]
-
-// Internal SidebarContent component
-function SidebarContentSection() {
   return (
-    <ScrollArea className="h-[calc(100vh-4rem)]">
-      <SidebarGroup>
-        <SidebarMenu>
-          {mainNavItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
-              <SidebarMenuButton>
-                <item.icon className="size-5" />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroup>
+    <div className="overflow-y-auto h-full px-2">
+      <ul>
+        {mainNavItems.map(({ icon: Icon, label: lbl, to }) => (
+          <li key={lbl}>
+            <Link to={to} className={baseItem}>
+              <Icon className="w-5 h-5" />
+              {!collapsed && <span className={label}>{lbl}</span>}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
-      <Separator className="my-2" />
+      <hr className="my-3 border-[var(--sidebar-border)]" />
 
-      <SidebarGroup>
-        <SidebarGroupLabel>Library</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {libraryItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton>
-                  <item.icon className="size-5" />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <ul>
+        {libraryItems.map(({ icon: Icon, label: lbl, to }) => (
+          <li key={lbl}>
+            <Link to={to} className={baseItem}>
+              <Icon className="w-5 h-5" />
+              {!collapsed && <span className={label}>{lbl}</span>}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
-      <Separator className="my-2" />
+      <hr className="my-3 border-[var(--sidebar-border)]" />
 
-      <SidebarGroup>
-        <SidebarGroupLabel>Subscriptions</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {subscriptions.map((channel) => (
-              <SidebarMenuItem key={channel.id}>
-                <SidebarMenuButton>
-                  <img src={channel.avatar || "/placeholder.svg"} alt={channel.name} className="size-5 rounded-full" />
-                  <span>{channel.name}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            <SidebarMenuItem>
-              <SidebarMenuButton>
-                <Plus className="size-5" />
-                <span>Browse Channels</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      <ul>
+        {subscriptions.map((s) => (
+          <li key={s.id}>
+            <button className={`${baseItem} w-full text-left`}>
+              <img src={s.avatar} alt={s.name} className="w-5 h-5 rounded-full" />
+              {!collapsed && <span className={label}>{s.name}</span>}
+            </button>
+          </li>
+        ))}
+        <li>
+          <Link to="/channels" className={baseItem}>
+            <Plus className="w-5 h-5" />
+            {!collapsed && <span className={label}>Browse Channels</span>}
+          </Link>
+        </li>
+      </ul>
 
-      <Separator className="my-2" />
+      <hr className="my-3 border-[var(--sidebar-border)]" />
 
-      <SidebarGroup>
-        <SidebarGroupLabel>Explore</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {exploreItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton>
-                  <item.icon className="size-5" />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    </ScrollArea>
+      <ul>
+        {exploreItems.map(({ icon: Icon, label: lbl, to }) => (
+          <li key={lbl}>
+            <Link to={to} className={baseItem}>
+              <Icon className="w-5 h-5" />
+              {!collapsed && <span className={label}>{lbl}</span>}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
-// Changed to default export
-const YoutubeSidebar = () => {
+export default function YoutubeSidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setMobileOpen(false)
+      }
+    }
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
+
   return (
     <>
-    
-      {/* Desktop Sidebar */}
-      <Sidebar className="hidden border-r transition-all duration-300 ease-in-out md:flex mt-[4rem]" collapsible="icon">
-        <SidebarContent>
-          <SidebarContentSection />
-        </SidebarContent>
-        <SidebarRail />
-      </Sidebar>
+      <aside
+        className={`
+          relative z-30 top-0 h-full
+          transition-all duration-300 ease-in-out
+          bg-[var(--sidebar)] text-[var(--sidebar-foreground)] border-r border-[var(--sidebar-border)]
+          shadow-lg
+          ${mobileOpen ? "left-0 w-64" : "left-[-100%] w-0"}
+          md:left-0
+          ${collapsed ? "md:w-[70px]" : "md:w-64"}
+        `}
+      >
+        <div className="hidden md:flex justify-end p-2 border-b border-[var(--sidebar-border)]">
+          <button onClick={() => setCollapsed(!collapsed)}>
+            <Menu className="w-5 h-5 text-[var(--sidebar-foreground)]" />
+          </button>
+        </div>
+        <SidebarContent collapsed={collapsed} />
+      </aside>
 
-      {/* Mobile Menu Button */}
-      <div className="fixed left-4 top-2 z-50 md:hidden">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="mt-1">
-              <Menu className="size-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] p-0">
-            <div className="flex h-16 items-center gap-2 border-b px-6">
-              <Youtube className="size-6" />
-              <span className="font-semibold">YouTube</span>
-            </div>
-            <SidebarContentSection />
-          </SheetContent>
-        </Sheet>
-      </div>
+      {/* Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
     </>
   )
 }
-
-// Add default export
-export default YoutubeSidebar
-

@@ -6,10 +6,9 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import axios from "axios"
 import { useSelector } from "react-redux"
 
-export function CommentSection({video}) {
-
-  const {data} = useSelector(state=> state.auth)
-  console.log("auth", data)
+export function CommentSection({ video }) {
+  const { data } = useSelector(state => state.auth)
+  
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -19,63 +18,66 @@ export function CommentSection({video}) {
   const [editingCommentId, setEditingCommentId] = useState(null)
   const [editContent, setEditContent] = useState("")
   const observer = useRef()
+  const didCancel = useRef(false)
 
   const lastCommentElementRef = useCallback(node => {
     if (loading) return
     if (observer.current) observer.current.disconnect()
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && hasMore) {
-        setPage(prevPage => prevPage + 1)
+        setPage(prev => prev + 1)
       }
     })
     if (node) observer.current.observe(node)
   }, [loading, hasMore])
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async (videoId, currentPage) => {
     try {
       setLoading(true)
-      const response = await axios.get(`/api/v1/comments/${video._id}?page=${page}`)
+      const response = await axios.get(`/api/v1/comments/getvideocomments/${videoId}?page=${currentPage}`)
       const newComments = response.data.data.comments
-      
-      // If it's page 1, replace comments, otherwise append
-      if (page === 1) {
-        setComments(newComments)
-      } else {
-        setComments(prev => [...prev, ...newComments])
-      }
-      
-      setHasMore(response.data.data.pagination.hasNextPage)
+      const { hasNextPage } = response.data.data.pagination
+
+      if (didCancel.current) return
+
+      setComments(prev => currentPage === 1 ? newComments : [...prev, ...newComments])
+      setHasMore(hasNextPage)
       setLoading(false)
     } catch (err) {
-      setError(err.message)
-      setLoading(false)
+      if (!didCancel.current) {
+        setError(err.message || "Failed to load comments")
+        setLoading(false)
+      }
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchComments()
-  }, [page, video._id])
-
-  // Reset everything when video changes
-  useEffect(() => {
+    didCancel.current = false
     setComments([])
     setPage(1)
     setHasMore(true)
-  }, [video._id])
+    fetchComments(video._id, 1)
+    return () => {
+      didCancel.current = true
+    }
+  }, [video._id, fetchComments])
+
+  useEffect(() => {
+    if (page !== 1) {
+      fetchComments(video._id, page)
+    }
+  }, [page, video._id, fetchComments])
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return
-
     try {
-      const response = await axios.post(`/api/v1/comments/${video._id}`, {
+      await axios.post(`/api/v1/comments/addcomment/${video._id}`, {
         content: newComment
       })
-
-      // Get the newly created comment with a separate request to ensure we have all fields
-      const commentResponse = await axios.get(`/api/v1/comments/${video._id}?page=1&limit=1`)
+      const commentResponse = await axios.get(`/api/v1/comments/getvideocomments/${video._id}?page=1&limit=1`)
+      console.log('comment',commentResponse);
+      
       const newCommentData = commentResponse.data.data.comments[0]
-
-      // Add new comment to start of comments array
       setComments(prevComments => [newCommentData, ...prevComments])
       setNewComment("")
     } catch (err) {
@@ -85,18 +87,16 @@ export function CommentSection({video}) {
 
   const handleToggleLike = async (commentId, index) => {
     try {
-      await axios.post(`/api/v1/likes/toggle/c/${commentId}`)
-      
-      // Update the comment's like status and count locally
-      setComments(prevComments => {
-        const updatedComments = [...prevComments]
-        const comment = {...updatedComments[index]}
+      await axios.post(`/api/v1/like/togglecommentlike/${commentId}`)
+      setComments(prev => {
+        const updated = [...prev]
+        const comment = { ...updated[index] }
         comment.isLiked = !comment.isLiked
-        comment.likesCount = comment.isLiked 
-          ? comment.likesCount + 1 
-          : comment.likesCount - 1
-        updatedComments[index] = comment
-        return updatedComments
+        comment.countLikes = comment.isLiked
+          ? comment.countLikes + 1
+          : comment.countLikes - 1
+        updated[index] = comment
+        return updated
       })
     } catch (err) {
       console.error("Failed to toggle like:", err)
@@ -105,8 +105,8 @@ export function CommentSection({video}) {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(`/api/v1/comments/c/${commentId}`)
-      setComments(prevComments => prevComments.filter(comment => comment._id !== commentId))
+      await axios.post(`/api/v1/comments/deletecomment/${commentId}`)
+      setComments(prev => prev.filter(comment => comment._id !== commentId))
     } catch (err) {
       console.error("Failed to delete comment:", err)
     }
@@ -114,17 +114,17 @@ export function CommentSection({video}) {
 
   const handleEditComment = async (commentId) => {
     if (!editContent.trim()) return
-    
     try {
-      await axios.patch(`/api/v1/comments/c/${commentId}`, {
+      await axios.post(`/api/v1/comments/updatecomment/${commentId}`, {
         content: editContent
       })
-      
-      setComments(prevComments => prevComments.map(comment => 
-        comment._id === commentId 
-          ? {...comment, content: editContent}
-          : comment
-      ))
+      setComments(prev =>
+        prev.map(comment =>
+          comment._id === commentId
+            ? { ...comment, content: editContent }
+            : comment
+        )
+      )
       setEditingCommentId(null)
       setEditContent("")
     } catch (err) {
@@ -141,8 +141,8 @@ export function CommentSection({video}) {
           <AvatarFallback>{data?.fullName?.[0]}</AvatarFallback>
         </Avatar>
         <div className="flex-grow">
-          <Textarea 
-            placeholder="Add a comment..." 
+          <Textarea
+            placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
           />
@@ -153,19 +153,20 @@ export function CommentSection({video}) {
         </div>
       </div>
       <div className="mt-6 space-y-4">
+        {console.log(comments,"ssrgssssssssssssssssssssssssssssssssssssssss")  }      
         {comments.map((comment, index) => (
-          <div 
-            key={comment._id} 
+          <div
+            key={comment._id}
             ref={index === comments.length - 1 ? lastCommentElementRef : null}
             className="flex space-x-4"
-          >
+          > {console.log(comment.owner._id)}
             <Avatar>
               <AvatarImage src={comment.owner.avatar} alt={comment.owner.fullName} />
               <AvatarFallback>{comment.owner.fullName[0]}</AvatarFallback>
             </Avatar>
             <div className="flex-grow">
               <p className="text-sm font-semibold">
-                {comment.owner.fullName} 
+                {comment.owner.fullName}
                 <span className="font-normal text-muted-foreground ml-2">
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </span>
@@ -178,32 +179,29 @@ export function CommentSection({video}) {
                     className="mb-2"
                   />
                   <div className="flex justify-end space-x-2">
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => {
-                        setEditingCommentId(null)
-                        setEditContent("")
-                      }}
-                    >
+                    <Button variant="ghost" onClick={() => {
+                      setEditingCommentId(null)
+                      setEditContent("")
+                    }}>
                       Cancel
                     </Button>
-                    <Button onClick={() => handleEditComment(comment._id)}>
-                      Save
-                    </Button>
+                    <Button onClick={() => handleEditComment(comment._id)}>Save</Button>
                   </div>
                 </div>
               ) : (
                 <p className="mt-1">{comment.content}</p>
               )}
               <div className="mt-1 flex items-center space-x-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className={`${comment.isLiked ? 'text-blue-600' : ''}`}
                   onClick={() => handleToggleLike(comment._id, index)}
-                >
+                >{console.log('sdsd',data)}
+                {console.log('sdsd',comment.owner)}
+                
                   <ThumbsUp className="mr-2 h-4 w-4" />
-                  {comment.likesCount}
+                  {comment.countLikes}
                 </Button>
                 {data?._id === comment.owner._id && (
                   <>
@@ -231,7 +229,8 @@ export function CommentSection({video}) {
           </div>
         ))}
         {loading && <div>Loading...</div>}
-        {error && <div>Error: {error}</div>}
+        {error && <div className="text-red-500">Error: {error}</div>}
+        {!hasMore && !loading && <div className="text-gray-500 text-sm text-center">No more comments.</div>}
       </div>
     </div>
   )

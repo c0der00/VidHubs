@@ -10,8 +10,10 @@ export function SubscribedChannels({ channelId }) {
   useEffect(() => {
     const fetchSubscribedChannels = async () => {
       try {
-        const response = await axios.get(`/api/v1/subscriptions/c/${channelId}`)
-        setSubscribedChannels(response.data.data[0].subscribedChannels)
+        const response = await axios.get(`/api/v1/sub/getsubscribedchannels/${channelId}`)
+        console.log(response.data);
+        
+        setSubscribedChannels(response.data.data)
         setLoading(false)
       } catch (err) {
         setError(err.message)
@@ -30,12 +32,12 @@ export function SubscribedChannels({ channelId }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {subscribedChannels.map((channel) => (
         <div key={channel._id} className="flex items-center space-x-4">
-          <Avatar>
-            <AvatarImage src={channel.channelDetails.avatar} alt={channel.channelDetails.fullName} />
-            <AvatarFallback>{channel.channelDetails.fullName[0]}</AvatarFallback>
+          <Avatar>{console.log(channel.channel[0].fullName)}
+            <AvatarImage src={channel.channel[0].avatar} alt={channel.channel[0].fullName} />
+            <AvatarFallback>{channel.channel[0].fullName}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold">{channel.channelDetails.fullName}</h3>
+            <h3 className="font-semibold">{channel.channel[0].fullName}</h3>
             <p className="text-sm text-muted-foreground">{channel.subscriberCount} subscribers</p>
           </div>
         </div>

@@ -8,7 +8,7 @@ export function PlaylistGrid({ channelId }) {
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await axios.get(`/api/v1/playlist/user/${channelId}`)
+        const response = await axios.get(`/api/v1/playlists/getuserplaylists/${channelId}`)
         setPlaylists(response.data.data)
       } catch (error) {
         console.error("Error fetching playlists:", error)
@@ -18,7 +18,7 @@ export function PlaylistGrid({ channelId }) {
     if (channelId) {
       fetchPlaylists()
     }
-  }, [channelId])
+  }, [channelId]) 
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

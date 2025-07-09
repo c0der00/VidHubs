@@ -40,7 +40,7 @@ const videoSechma = Schema(
         }
     },
     {
-        timestampss : true
+        timestamps : true
     }
 )
 

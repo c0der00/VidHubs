@@ -73,6 +73,7 @@ export default function ChannelPage() {
       try {
         const response = await axios.get(`/api/v1/users/c/${username}`);
         setChannelInfo(response.data.data);
+
       } catch (error) {
         console.error("Error fetching channel info:", error);
       } finally {

@@ -9,7 +9,7 @@ dotenv.config({
 
 
 // WRITE CODE IN APP.JS
- import core from 'core-js'
+ import cors from 'cors'
  import cookieParser from 'cookie-parser'
 
  const app = express()
@@ -20,6 +20,10 @@ dotenv.config({
  app.use(express.urlencoded({extended:true,limit:"20kb"}))
  app.use(express.static("public"))
 
+ app.use(cors({
+    origin: "http://localhost:5173",
+    credentials : true
+ }))
  app.use(cookieParser())
 
 connectDB() 

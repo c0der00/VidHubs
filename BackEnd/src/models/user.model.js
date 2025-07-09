@@ -44,7 +44,7 @@ const userSechema = Schema({
     refreshToken : {
         type : String
     }
-})
+},{timestamps : true})
 
 userSechema.pre("save" , async function (next) {
     if(!this.isModified("password")) return next();

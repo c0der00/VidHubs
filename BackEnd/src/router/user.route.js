@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
+import { currentUser, getUserChannelProfile, getWatchHistory, loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
 import { verifyJwt } from "../middelwares/auth.middelware.js";
 import {upload} from '../middelwares/multer.middelwares.js'
 
@@ -24,7 +24,11 @@ router.route("/login").post(loginUser)
 
 router.route('/logout').post(verifyJwt,logoutUser)
 
+router.route('/c/:username').get(verifyJwt,getUserChannelProfile)
 
+router.route('/watch').get(verifyJwt,getWatchHistory)
+
+router.route('/current-user').get(verifyJwt,currentUser)
 
 
 export default router

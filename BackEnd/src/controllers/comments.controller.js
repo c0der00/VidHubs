@@ -7,33 +7,37 @@ import { Video } from "../models/video.model.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
-    const {videoId} = req.params
-    const {page = 1, limit = 10} = req.query
 
-    if(page > 1){
-        throw new ApiError(400,"page is not found")
+    const { videoId } = req.params;
+    let { page = 1, limit = 10 } = req.query;
+
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    if (page < 1 || isNaN(page)) {
+        throw new ApiError(400, "Page must be greater than 0");
     }
 
-    if(!isValidObjectId(videoId)){
-        throw new ApiError(400,"video id is invalide")
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video ID");
     }
 
-    if(!videoId){
-        throw new ApiError(400,"invalid video id")
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(404, "Video not found");
     }
 
-
-    const video = await Video.findById(videoId)
-
-    if(!video){
-        throw new ApiError(400,"video is not found")
-    }
+    const totalComments = await Comment.countDocuments({ video: videoId });
+    const totalPages = Math.ceil(totalComments / limit);
 
     const comments = await Comment.aggregate([
         {
             $match: {
                 video : new mongoose.Types.ObjectId(videoId)
             }
+        },
+        {
+            $sort: { createdAt: -1 }
         },
         {
             $skip: (page - 1) * limit
@@ -43,7 +47,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from : "User",
+                from : "users",
                 localField: "owner",
                 foreignField : "_id",
                 as : "owner",
@@ -60,7 +64,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
         },
         {
             $lookup:{
-                from : "Like",
+                from : "likes",
                 localField :"_id",
                 foreignField : "comment",
                 as : "likes"
@@ -100,7 +104,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(
         200,
-        comments,
+        {
+            comments,
+            pagination: {
+                page,
+                limit,
+                totalPages,
+                totalComments,
+                hasNextPage: page < totalPages,
+                hasPrevPage: page > 1
+            }
+        },
         "comments fatch successfuly"
     ))
 })

@@ -1,8 +1,8 @@
-export function VideoPlayer({src }) {
+export function VideoPlayer({videoId}) {  
     return (
       <div className="aspect-video w-full bg-muted">
         <video
-          src={src}
+          src={videoId.videoFile}
           title="YouTube video player"
           controls
           playsInline

@@ -3,6 +3,7 @@ import {ApiError} from '../utils/ApiError.js'
 import { User } from '../models/user.model.js'
 import {ApiResponse} from '../utils/ApiResponse.js'
 import {uploadOnCloudinary} from '../utils/cloudinary.js'
+import mongoose from 'mongoose'
 
 
 const generateAccessAndRefereshToken = async(userId) => {
@@ -120,6 +121,8 @@ const currentUser = asyncHandler(async (req,res)=> {
     .json(new ApiResponse(200,req.user,"currentuser"))
 })
 
+
+
 const updatedUserDetail = asyncHandler(async(req,res) => {
     const {email,fullName} = req.body
 
@@ -156,7 +159,7 @@ const loginUser = asyncHandler(async (req,res) => {
     })
 
     if(!user){
-        throw new ApiError(404,"user is not exits")
+        throw new ApiError(400,"user is not exits")
     }
 
     const isPasswoedValid = await user.isPasswordCorrect(password)
@@ -182,7 +185,7 @@ const loginUser = asyncHandler(async (req,res) => {
     .cookie("accessToken",accsessToken,options)
     .cookie("refreshToken",refreshToken,options)
     .json(
-        new ApiError(200,{
+        new ApiResponse(200,{
             user : loggrdUser,
             accessToken : accsessToken,
             refreshToken : refreshToken
@@ -266,7 +269,7 @@ const logoutUser = asyncHandler(async(req,res) => {
     .status(200)
     .clearCookie("accessToken",options)
     .clearCookie("refreshToken")
-    .json(new ApiError(200,{},'userlogout'))
+    .json(new ApiResponse(200,{},'userlogout'))
 })
 
 const getUserChannelProfile = asyncHandler(async(req,res) => {
@@ -299,10 +302,10 @@ const getUserChannelProfile = asyncHandler(async(req,res) => {
        {
         $addFields:{
             subscriberCount : {
-                sizes:"$subscribers"
+                $size:"$subscribers"
             },
             channelsSubscribedToCount:{
-                sizes:"$subscribersTo"
+                $size:"$subscribersTo"
             },
             isSubscribed:{
                 $cond:{
@@ -327,7 +330,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) => {
        }
  ])
 
- if(!channel?.lenght){
+ if(!channel?.length){
     throw new ApiError(404,"chennal is not exists")
  }
 
@@ -345,7 +348,7 @@ const getWatchHistory = asyncHandler(async(req,res)=> {
         },
         {
             $lookup:{
-                form:"video",
+                form:"videos",
                 localField:"WatchHistory",
                 foreignField:"_id",
                 as:"watchHistory",
@@ -367,7 +370,7 @@ const getWatchHistory = asyncHandler(async(req,res)=> {
                                 {
                                     $addFields : {
                                         owner : {
-                                            $first:"$owner"
+                                            $first:"$videos"
                                         }
                                     }
                                 }
