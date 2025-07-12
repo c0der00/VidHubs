@@ -57,7 +57,7 @@ export function ChannelInfo({username}) {
           <AvatarImage src={channelData.avatar} alt={channelData.fullName} />
           <AvatarFallback>{channelData.fullName[0]}</AvatarFallback>
         </Avatar>
-        <div>{console.log(channelData)}
+        <div>
           <h1 className="text-2xl font-bold">{channelData.fullName}</h1>
           <p className="text-muted-foreground">{channelData.subscriberCount} subscribers</p>
           <p className="mt-4 text-sm w-full lg:w-1/2">@{channelData.username}</p>

@@ -8,7 +8,6 @@ import {
   Search,
   User,
   Youtube,
-  Menu,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -45,13 +44,12 @@ export function YoutubeHeader() {
     if (auth?.data) {
       setUser(auth.data);
   } else {
-    setUser(null); // Reset local user state on logout
+    setUser(null);
   }
   },[auth.data?.user]);
 
   const handleLogout = async () => {
     try {
-      console.log('lllllllllllllllllll');
       await newRequest.post(
         "/api/v1/users/logout",
         {},
@@ -68,13 +66,20 @@ export function YoutubeHeader() {
 
   const handleSearch = async() => {
     try {
-      console.log(search);
       const trimmed = search.trim();
     if (trimmed) {
       navigate(`/?query=${encodeURIComponent(trimmed)}`);
     }
     } catch (error) {
       console.error("search fail",error)
+    }
+  }
+
+  const handleSwich = async() => {
+    try {
+      navigate("/login")
+    } catch (error) {
+      console.error("swichout fail",error)
     }
   }
 
@@ -116,8 +121,6 @@ export function YoutubeHeader() {
             <VoiceSearch
               onVoiceResult={(text) => {
                 setSearch(text);
-                console.log(text);
-                
                 if (text && text.trim()) {
                   navigate(`/?query=${encodeURIComponent(text.trim())}`);
                 }
@@ -128,7 +131,7 @@ export function YoutubeHeader() {
 
         {/* Mobile Search */}
         <div className="flex flex-1 justify-end gap-2 md:hidden">
-          <Sheet>{console.log(auth?.data)}
+          <Sheet>
             <SheetTrigger asChild>
               <Button type="submit" variant="ghost" size="icon">
                 <Search className="size-5" />
@@ -219,7 +222,7 @@ export function YoutubeHeader() {
                   <DropdownMenuItem>Your Channel</DropdownMenuItem>
                 </Link>
                 <DropdownMenuItem>YouTube Studio</DropdownMenuItem>
-                <DropdownMenuItem>Switch Account</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSwich}>Switch Account</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   Sign Out
                 </DropdownMenuItem>

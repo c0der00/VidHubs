@@ -31,9 +31,7 @@ const generateAccessAndRefereshToken = async(userId) => {
 
 
 const registerUser = asyncHandler ( async(req,res) => {
-    // res.status(200).json({
-    //     message: 'ok',
-    // })
+
     if(!req.body){
         console.log("req body is emty",);
         throw new ApiError(500,"req bosy is empty")

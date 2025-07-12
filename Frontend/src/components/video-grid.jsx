@@ -32,7 +32,6 @@ export function VideoGrid({channelId}) {
        
         // Filter out any duplicate videos based on _id
         const newVideos = response.data?.data
-        console.log(response.data);
         
         setVideos(prev => {
           const uniqueVideos = [...prev]
@@ -58,7 +57,6 @@ export function VideoGrid({channelId}) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      { console.log(videos,"DDDDDDDDDDDDDDDDDDDD")}
       {videos.map((video, index) => {
         if (videos.length === index + 1) {
           return (

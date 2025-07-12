@@ -72,8 +72,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
         },
         {
             $addFields: {
-                countLikes: { $size: "$likes" },  // Count the number of elements in the 'likes' array
-                owner: { $arrayElemAt: ["$owner", 0] },  // Extract the first element from the 'owner' array
+                countLikes: { $size: "$likes" },
+                owner: { $arrayElemAt: ["$owner", 0] }, 
                 isLikes: {
                     $cond: {
                         if: {
@@ -81,15 +81,15 @@ const getVideoComments = asyncHandler(async (req, res) => {
                                 { 
                                     $size: { 
                                         $filter: {
-                                            input: "$likes",  // The 'likes' array
-                                            as: "like",  // Alias for each element in the array
+                                            input: "$likes",
+                                            as: "like",  
                                             cond: { 
-                                                $eq: ["$$like.likedBy", new mongoose.Types.ObjectId(req.user?._id)]  // Compare the 'likedBy' field to the current user's ObjectId
+                                                $eq: ["$$like.likedBy", new mongoose.Types.ObjectId(req.user?._id)]   
                                             }
                                         }
                                     }
                                 },
-                                0  // If the size of the filtered array is greater than 0, it means the user has liked the item
+                                0 
                             ]
                         },
                         then: true,
@@ -210,9 +210,7 @@ const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Comment not found");
     }
 
-    // if (comment.owner.toString() !== req.user._id.toString()) {
-    //     throw new ApiError(403, "You are not authorized to delete this comment");
-    // }
+ 
 
     await Comment.findByIdAndDelete(commentId);
 

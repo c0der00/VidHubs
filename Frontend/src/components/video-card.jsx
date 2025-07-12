@@ -5,14 +5,11 @@ import formatTime from "../utils/formatTime"
 
 export function VideoCard({ video }) {
   const [videoData, setVideoData] = useState(video)
-console.log(video);
 
   useEffect(() => {
-    // Update videoData when video prop changes
     setVideoData(video)
   }, [video])
 
-  // Check if video exists to prevent errors
   if (!videoData) {
     return null;
   }
@@ -30,7 +27,7 @@ console.log(video);
       </Link>
       <div className="flex space-x-3">
         <Link to={`/c/${videoData.owner?.username}`}>
-          <Avatar className="h-9 w-9">{console.log('reco',videoData)}
+          <Avatar className="h-9 w-9">
           
             <AvatarImage src={videoData.owner?.avatar} alt={videoData.owner?.fullName} />
             <AvatarFallback>{videoData.owner?.fullName?.[0]}</AvatarFallback>

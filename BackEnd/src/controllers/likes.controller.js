@@ -6,6 +6,7 @@ import { Video } from "../models/video.model.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { Comment } from "../models/comments.model.js";
+import { User } from "../models/user.model.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
@@ -140,62 +141,67 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 )
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-    //TODO: get all liked videos
-    const {limit =10, pages = 1} = req.query
+    const { limit = 10, pages = 1 } = req.query;
 
-    if(pages < 1){
-        throw new ApiError(400,"invalid page number")
+    const parsedLimit = parseInt(limit);
+    const parsedPage = parseInt(pages);
+
+    if (parsedPage < 1) {
+        throw new ApiError(400, "Invalid page number");
     }
 
     const liked = await Like.find({
         likedBy: req.user?._id,
-        video: { $exists: true } 
+        video: { $exists: true }
     })
     .populate({
         path: 'video',
-        select: '_id thumbnail title description duration views isPublished',
-        match: { isPublished: true }
+        select: '_id thumbnail title description duration viwes owner isPublished',
+        match: { isPublished: true },
+        populate: {
+            path: 'owner',
+            model: 'User',
+            select: '_id fullName username avatar coverImage'
+        }
     })
-    .skip((pages - 1) * limit)
-    .limit(limit);
+    .skip((parsedPage - 1) * parsedLimit)
+    .limit(parsedLimit);
 
-    const filteredLike =  liked.filter(like => like.video !== null)
+    const filteredLikes = liked.filter(like => like.video !== null);
 
     const totalLikedVideo = await Like.countDocuments({
-        video : {$exists: true},
-        likedBy : req.user._id,
-    })
+        likedBy: req.user._id,
+        video: { $exists: true }
+    });
 
-    const totalPages = Math.ceil(totalLikedVideo / limit);
-     const pagination = {
+    const totalPages = Math.ceil(totalLikedVideo / parsedLimit);
+
+    const pagination = {
         totalPages,
-        hasNextPage : pages < totalPages,
-        hasPreviousPage : pages>1,
-        currentPage : Number(pages),
+        hasNextPage: parsedPage < totalPages,
+        hasPreviousPage: parsedPage > 1,
+        currentPage: parsedPage,
         totalLikedVideo
-     }
+    };
 
-     if(filteredLike.length === 0){
-        return res
-        .status(200)
-        .json(new ApiResponse(
-            200,
-            pagination,
-            "liked video not found"
-        ))
-     }
+    if (filteredLikes.length === 0) {
+        return res.status(200).json(
+            new ApiResponse(200, pagination, "No liked videos found")
+        );
+    }
 
-     const video = filteredLike.map(like => like.video)
+     
+    const videos = filteredLikes.map(like => like.video);
 
-     return res
-     .status(200)
-     .json(new ApiResponse(
-        200,
-        video,
-        pagination,
-        "liked video is facth successfuly"
-     ))
-})
+    return res.status(200).json(
+        new ApiResponse(200, {
+            videos,
+            pagination
+        }, "Liked videos fetched successfully")
+    );
+});
+
+
 
 export {
     toggleCommentLike,

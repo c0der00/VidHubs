@@ -23,7 +23,7 @@ export function PlaylistGrid({ channelId }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {playlists.map((playlist) => (      
-        <Link to={`/playlist/${playlist._id}`} key={playlist._id} className="group">{console.log(playlist)}
+        <Link to={`/playlist/${playlist._id}`} key={playlist._id} className="group">
           <div className="aspect-video relative overflow-hidden rounded-lg">
             <img
               src={"/placeholder.svg"}

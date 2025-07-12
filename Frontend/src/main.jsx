@@ -24,6 +24,7 @@ import VideoDetail from "./pages/VideoDetail.jsx";
 import ChannelPage from "./pages/ChannelPage.jsx";
 import PlaylistDetailPage from "./components/PlaylistDetail.jsx";
 import WatchHistory from "./components/WatchHistory.jsx";
+import LikeVideo from "./components/like-video.jsx";
 
 
 const AppLayout = () => (
@@ -51,6 +52,7 @@ createRoutesFromElements(
     <Route path="/publish-video" element={<PublishPage />} />
     <Route path="//playlist/:playlistId" element={<PlaylistDetailPage/>}/>
     <Route path="/watch-hisroty" element={<WatchHistory/>}/>
+    <Route path="/liked-videos" element={<LikeVideo/>}/>
     </Route>
 )
 );

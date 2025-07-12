@@ -25,7 +25,7 @@ const userSechema = Schema({
         trim : true,
     },
     avatar : {
-        type : String, //cloudenarry
+        type : String, 
         required : true,
     },
     coverImage: {

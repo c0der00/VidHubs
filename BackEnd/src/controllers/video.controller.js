@@ -257,7 +257,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 
       if (req.user?._id) {
         await User.findByIdAndUpdate(req.user._id, {
-          $addToSet: { watchHistory: videoId } // prevents duplicates
+          $addToSet: { watchHistory: videoId } 
         });
       }
     }
@@ -442,7 +442,7 @@ const getChannelVideosByChannelId = asyncHandler(async (req, res) => {
         { $sort: sortObj },
         {
             $lookup: {
-                from: "users", // assuming 'users' is your collection name
+                from: "users",
                 localField: "owner",
                 foreignField: "_id",
                 as: "ownerDetails",

@@ -50,34 +50,38 @@ const WatchHistory = () => {
             {history.map((video) => (
               <div
                 key={video._id}
-                className=" flex flex-col sm:flex-row items-center sm:items-center bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group"
+                className="flex flex-row items-center bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 group"
               >
                 <Link
                   to={`/video/${video._id}`}
                   aria-label={`Watch video: ${video.title}`}
-                  className="flex flex-col sm:flex-row w-full sm:items-start group focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg overflow-hidden"
+                  className="flex items-start w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg overflow-hidden"
                 >
-                  <div className="relative w-full sm:w-52 h-36 sm:h-32 flex-shrink-0">
+                  {/* Image */}
+                  <div className="relative w-52 h-32 flex-shrink-0">
                     <img
                       src={video.thumbnail}
                       alt={video.title}
                       className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                     />
+                    <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded">
+                      {formatTime(video?.duration)}
+                    </div>
                   </div>
 
-                  <div className="flex-1 p-4">
-                    <h2 className="text-base sm:text-lg font-semibold text-black dark:text-white line-clamp-2 group-hover:underline transition-colors">
+                  {/* Text */}
+                  <div className="p-4 flex-1">
+                    <h2 className="text-lg font-semibold text-black dark:text-white line-clamp-2 group-hover:underline transition-colors">
                       {video.title}
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {video?.owner?.username} • {video?.viwes || 0} views •{" "}
-                      {formatTime(video?.duration)}
+                      {video?.owner?.username} • {video?.viwes || 0} views
                     </p>
                   </div>
                 </Link>
 
-
-                <div className="p-4 self-end sm:self-center">
+                {/* Remove Button */}
+                <div className="p-4">
                   <Button
                     variant="ghost"
                     onClick={() => removeVideo(video._id)}
@@ -88,6 +92,7 @@ const WatchHistory = () => {
                   </Button>
                 </div>
               </div>
+
             ))}
           </div>
         )}
