@@ -57,7 +57,7 @@ function SidebarContent({ collapsed }) {
   const handelSubscriptions = async() => {
   try {
     const response = await axios.get(`/api/v1/sub/getsubscribedchannels/${data._id}`) 
-    setSubscriptions(response.data?.data[0]?.channel)  
+    setSubscriptions(response.data?.data[0]?.channel || [])  
   } catch (error) {
     console.error("fail to fatch subscriptions",error)
   }

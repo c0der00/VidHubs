@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react"
 import { Button } from "./ui/button"
-import { ThumbsUp, Share2 } from "lucide-react"
+import { ThumbsUp, Share2, Facebook, Twitter, Wheat, Instagram, Linkedin, CopyIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import axios from "axios"
+import {
+  EmailIcon,
+  EmailShareButton,
+  FacebookShareButton,
+  InstapaperShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+  WhatsappShareButton
+} from "react-share";
 
 export function VideoInfo({ video}) {
-  console.log("video", video)
   const [channelData, setChannelData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [isLiked, setIsLiked] = useState(video.isLiked)
   const [likesCount, setLikesCount] = useState(video.likesCount)
+  const [share,setShare] = useState(false);
+  const currentUrl = window.location.href;
 
   useEffect(() => {
     const fetchChannelData = async () => {
@@ -55,6 +65,87 @@ export function VideoInfo({ video}) {
       console.error("Failed to toggle like:", err)
     }
   }
+ 
+
+  function Share(){
+
+    const handleCopyUrl = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(currentUrl)
+        .then(() => {
+          alert("Link copied to clipboard!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy:", err);
+        });
+    }
+  };
+
+    return(
+      <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 w-80 h-1/2 bg-gray-800 rounded-xl shadow-2xl p-6">
+      {/* Close Button */}
+      <div className="flex justify-end">
+        <button
+          className="w-8 h-8 flex items-center justify-center bg-red-600 text-white rounded-full hover:bg-red-700 transition duration-200"
+          onClick={() => setShare(false)}
+        >
+          ☠️
+        </button>
+      </div>
+
+      <div className="text-center text-white text-xl font-semibold mt-2 mb-6">
+        Share
+      </div>
+
+      <div className="flex flex-wrap justify-center gap-6">
+        <FacebookShareButton url={currentUrl}>
+          <div className="bg-blue-600 rounded-full p-3 hover:bg-blue-700 transition duration-200">
+            <Facebook className="text-white w-6 h-6" />
+          </div>
+        </FacebookShareButton>
+
+        <EmailShareButton url={currentUrl}>
+          <div className="bg-red-500 rounded-full p-3 hover:bg-red-600 transition duration-200">
+            <EmailIcon className="text-white w-6 h-6" />
+          </div>
+        </EmailShareButton>
+
+        <TwitterShareButton url={currentUrl}>
+          <div className="bg-blue-500 rounded-full p-3 hover:bg-blue-600 transition duration-200">
+             <Twitter/>
+          </div>
+        </TwitterShareButton>
+
+        <WhatsappShareButton url={currentUrl}>
+          <div className="bg-green-500 rounded-full p-3 hover:bg-green-600 transition duration-200">
+            <Wheat/>
+          </div>
+        </WhatsappShareButton>
+
+        <InstapaperShareButton url={currentUrl}>
+          <div className="bg-red-500 rounded-full p-3 hover:bg-red-600 transition duration-200">
+            <Instagram/>
+          </div>
+        </InstapaperShareButton>
+       
+       <LinkedinShareButton url={currentUrl}>
+          <div className="bg-blue-500 rounded-full p-3 hover:bg-blue-600 transition duration-200">
+            <Linkedin/>
+          </div>
+       </LinkedinShareButton>   
+      </div>
+
+      <div className="flex pt-5 justify-center">
+        <button
+          className="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
+           onClick={handleCopyUrl}
+        >
+          <CopyIcon/>
+        </button>
+      </div>
+    </div>
+    )
+  }
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
@@ -70,7 +161,6 @@ export function VideoInfo({ video}) {
           </Avatar>
           <div>
             <p className="font-semibold">{channelData.fullName}</p>
-            {console.log(channelData,"dlfndddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")}
             <p className="text-sm text-muted-foreground">{channelData.subscriberCount} subscribers</p>
           </div>
         </div>
@@ -88,11 +178,12 @@ export function VideoInfo({ video}) {
             <ThumbsUp className="mr-2 h-4 w-4" />
             {isLiked ? "Liked" : "Like"} {likesCount > 0 && likesCount}
           </Button>
-          <Button variant="secondary">
+          <Button onClick={() => setShare(true)} variant="secondary">
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </Button>
         </div>
+         { share && <Share/>          }
       </div>
       <div className="mt-4 rounded-lg bg-muted p-4">
         <p className="text-sm">

@@ -18,8 +18,21 @@ dotenv.config({
  app.use(express.urlencoded({extended:true,limit:"20kb"}))
  app.use(express.static("public"))
 
+ const allowedOrigins = [
+  'http://localhost:5173',
+  'http://10.178.244.69:5173'
+];
+
  app.use(cors({
-    origin: "http://localhost:5173",
+    origin: function(origin, callback){
+    // allow requests with no origin (like curl or postman)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
     credentials : true
  }))
  app.use(cookieParser())

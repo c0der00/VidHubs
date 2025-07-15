@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Loader2 } from "lucide-react";
+import newRequest from "../utils/newRequest";
 
 function Home() {
   const [user, setUser] = useState(null);
@@ -29,10 +30,12 @@ function Home() {
       setLoading(true);
 
       const response = await axios.get(
-        `http://localhost:8000/api/v1/videos/getAllVideo?query=${query}&page=${page}&limit=10&sortBy=views&sortType=desc`
+        `http://10.178.244.69:8000/api/v1/videos/getAllVideo?query=${query}&page=${page}&limit=10&sortBy=views&sortType=desc`
       );
 
       const newVideos = response.data.data;
+      console.log(newVideos);
+      
       const pagination = response.data.massage.pagination;
 
       if (page === 1) {
